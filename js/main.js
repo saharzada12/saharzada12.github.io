@@ -80,8 +80,72 @@
     });
   }
 
-  // ---------- Scroll reveal ----------
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---------- Hero terminal typing ----------
+  var terminalCode = document.getElementById("terminal-code");
+  if (terminalCode && !reduceMotion) {
+    var terminalScript = [
+      [{ t: "$ ", c: "t-muted" }, { t: "whoami", c: "" }],
+      [{ t: "sahar-zada", c: "" }],
+      [{ t: "$ ", c: "t-muted" }, { t: "cat focus.txt", c: "" }],
+      [{ t: "full-stack dev, systems, ml", c: "" }],
+      [{ t: "$ ", c: "t-muted" }, { t: "status", c: "" }],
+      [{ t: "open to internships", c: "t-accent" }]
+    ];
+
+    terminalCode.textContent = "";
+    var cursor = document.createElement("span");
+    cursor.className = "terminal-cursor";
+    cursor.textContent = "▋";
+    terminalCode.appendChild(cursor);
+
+    var lineIndex = 0;
+    var segIndex = 0;
+    var charIndex = 0;
+    var currentSpan = null;
+
+    function typeNext() {
+      if (lineIndex >= terminalScript.length) return;
+
+      var seg = terminalScript[lineIndex][segIndex];
+
+      if (charIndex === 0) {
+        currentSpan = seg.c ? document.createElement("span") : null;
+        if (currentSpan) {
+          currentSpan.className = seg.c;
+          terminalCode.insertBefore(currentSpan, cursor);
+        }
+      }
+
+      var char = seg.t[charIndex];
+      if (currentSpan) {
+        currentSpan.textContent += char;
+      } else {
+        terminalCode.insertBefore(document.createTextNode(char), cursor);
+      }
+
+      charIndex++;
+      var delay = 28 + Math.random() * 34;
+
+      if (charIndex >= seg.t.length) {
+        charIndex = 0;
+        segIndex++;
+        if (segIndex >= terminalScript[lineIndex].length) {
+          segIndex = 0;
+          lineIndex++;
+          terminalCode.insertBefore(document.createElement("br"), cursor);
+          delay = 260;
+        }
+      }
+
+      setTimeout(typeNext, delay);
+    }
+
+    setTimeout(typeNext, 450);
+  }
+
+  // ---------- Scroll reveal ----------
   var revealTargets = document.querySelectorAll(
     ".about-grid, .project-card, .skill-group, .contact-inner"
   );
